@@ -1,9 +1,11 @@
 'use client'
 import { useEffect } from 'react'
-import { useOlpStatsStore } from '@/store/olpStats'
+import { OlpStats, useOlpStatsStore } from '@/store/olpStats'
 import { usePriceStore } from '@/store/price'
 import { usePortfolioStore } from '@/store/position'
 import { IMarket, OptionsInfo, useOptionsInfoStore } from '@/store/optionsInfo'
+import { getCurrentUTCDate, getLatestOlpAnalysisData } from '@/utils/helper'
+import Pako from 'pako'
 
 export function DataInitializer({ children }: { children: React.ReactNode }) {
   const { setOlpStats } = useOlpStatsStore()
@@ -14,21 +16,36 @@ export function DataInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchMarket = async () => {
       try {
-        const [marketRes, positionRes] = await Promise.all([
+        
+
+        const [marketRes, positionRes, olpAnalysisRes] = await Promise.all([
           fetch("https://moby-data.s3.ap-northeast-2.amazonaws.com/market-data.json"),
-          fetch("https://q32okcrsle.execute-api.ap-northeast-2.amazonaws.com/default/moby-arbitrum-one-prod-query?method=getMyPositions&address=0x9e34F79E39AddB64f4874203066fFDdD6Ab63a41")
+          fetch("https://q32okcrsle.execute-api.ap-northeast-2.amazonaws.com/default/moby-arbitrum-one-prod-query?method=getMyPositions&address=0x9e34F79E39AddB64f4874203066fFDdD6Ab63a41"),
+          fetch(`https://moby-data.s3.ap-northeast-2.amazonaws.com/olp-analysis/olp-analysis-daily-${getCurrentUTCDate()}.json.gz`)
         ])
 
-        if (!marketRes.ok || !positionRes.ok) {
+        if (!marketRes.ok || !positionRes.ok || !olpAnalysisRes.ok) {
           console.error('Failed to fetch initial data')
         }
 
-        const [marketData, positionData] = await Promise.all([
+        const [marketData, positionData, olpAnalysisDataGzip] = await Promise.all([
           marketRes.json(),
-          positionRes.json()
+          positionRes.json(),
+          olpAnalysisRes.arrayBuffer()
         ])
 
-        setOlpStats(marketData.data.olpStats.mOlp);
+        const olpAnalysisData = getLatestOlpAnalysisData(olpAnalysisDataGzip);
+
+        const olpStats: OlpStats = {
+          assets: olpAnalysisData.assets,
+          assetAmounts: marketData.data.olpStats.mOlp.assetAmounts,
+          positionValue: olpAnalysisData.positionValue,
+          greeks: marketData.data.olpStats.mOlp.greeks
+        }
+
+        console.log(olpStats, "olpStats")
+
+        setOlpStats(olpStats);
         setPriceData({
           futures: marketData.data.futuresIndices,
           spot: marketData.data.spotIndices,

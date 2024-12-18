@@ -1,10 +1,13 @@
 import { create } from "zustand";
 
-export interface Greeks {
-  delta: number
-  gamma: number 
-  vega: number
-  theta: number
+export interface Assets {
+  poolUsd: number
+  pendingMpUsd: number
+  pendingRpUsd: number
+  reservedUsd: number
+  utilizedUsd: number
+  availableUsd: number
+  depositedUsd: number
 }
 
 export interface AssetAmount {
@@ -13,22 +16,25 @@ export interface AssetAmount {
   depositedAmount: number
 }
 
-export interface UtilityRatio {
-  utilizedUsd: number
-  depositedUsd: number
+export interface Greeks {
+  delta: number
+  gamma: number 
+  vega: number
+  theta: number
 }
 
-interface OlpStats {
-  greeks: {
-    BTC: Greeks
-    ETH: Greeks
-  }
+export interface OlpStats {
+  assets: Assets,
   assetAmounts: {
     wbtc: AssetAmount
     weth: AssetAmount
     usdc: AssetAmount
+  },
+  positionValue: number,
+  greeks: {
+    BTC: Greeks
+    ETH: Greeks
   }
-  utilityRatio: UtilityRatio
 }
 
 interface OlpStatsState {
@@ -38,19 +44,14 @@ interface OlpStatsState {
 
 export const useOlpStatsStore = create<OlpStatsState>((set) => ({
   data: {
-    greeks: {
-      BTC: {
-        delta: 0,
-        gamma: 0,
-        vega: 0,
-        theta: 0
-      },
-      ETH: {
-        delta: 0,
-        gamma: 0,
-        vega: 0,
-        theta: 0
-      }
+    assets: {
+      poolUsd: 0,
+      pendingMpUsd: 0,
+      pendingRpUsd: 0,
+      reservedUsd: 0,
+      utilizedUsd: 0,
+      availableUsd: 0,
+      depositedUsd: 0
     },
     assetAmounts: {
       wbtc: {
@@ -69,10 +70,21 @@ export const useOlpStatsStore = create<OlpStatsState>((set) => ({
         depositedAmount: 0
       }
     },
-    utilityRatio: {
-      utilizedUsd: 0,
-      depositedUsd: 0
-    }
+    positionValue: 0,
+    greeks: {
+      BTC: {
+        delta: 0,
+        gamma: 0,
+        vega: 0,
+        theta: 0
+      },
+      ETH: {
+        delta: 0,
+        gamma: 0,
+        vega: 0,
+        theta: 0
+      }
+    },
   },
   setOlpStats: (newData) => set({ data: newData })
 }))

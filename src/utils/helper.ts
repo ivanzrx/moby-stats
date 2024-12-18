@@ -1,6 +1,7 @@
 import { ExpiryGroup } from "@/store/position";
 import { Strategy, Ticker, UA_TICKER_TO_DECIMAL, VaultIndex } from "./constants";
 import { OptionsInfo, OptionsInfoDetail } from "@/store/optionsInfo";
+import Pako from "pako";
 
 export interface ProcessedPosition {
   mainOptionName: string,
@@ -196,4 +197,26 @@ export function getPairedOptionName(optionTokenId: bigint, optionNames: string):
 export function getStrikePriceByInstrument(instrument: string): number {
   const instrumentArr = instrument.split("-");
   return Number(instrumentArr[2]);
+}
+
+export const getCurrentUTCDate = () => {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(now.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export function getLatestOlpAnalysisData(olpAnalysisDataGzip: ArrayBuffer) {
+  const olpAnalysisData = JSON.parse(
+    new TextDecoder().decode(
+      Pako.inflate(new Uint8Array(olpAnalysisDataGzip))
+    )
+  );
+
+  const latestTimestamp = Object.keys(olpAnalysisData).reduce((latest, current) => 
+    Number(current) > Number(latest) ? current : latest
+  );
+
+  return olpAnalysisData[latestTimestamp].mOlp;
 }
