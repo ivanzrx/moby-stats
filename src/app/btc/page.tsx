@@ -5,7 +5,7 @@ import { usePortfolioStore } from "@/store/position";
 import { Ticker } from "@/utils/constants";
 import { ProcessedPosition, transformAndSortPositionData } from "@/utils/helper";
 import { useEffect, useState } from "react";
-// 헬퍼 함수들
+
 const formatDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
   const day = date.getDate().toString().padStart(2, '0');
