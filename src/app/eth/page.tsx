@@ -152,7 +152,7 @@ export default function ETH() {
   const [positions, setPositions] = useState<{[key: string]: ProcessedPosition[]}>({});
 
   useEffect(() => {
-    if (!portfolioData || !optionsInfo) return;
+    if (!portfolioData?.[Ticker.UnderlyingAsset.ETH] || !optionsInfo) return;
     
     const processedPositions = transformAndSortPositionData(
       Ticker.UnderlyingAsset.ETH, 

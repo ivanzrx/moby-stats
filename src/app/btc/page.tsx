@@ -152,7 +152,7 @@ export default function BTC() {
   const [positions, setPositions] = useState<{[key: string]: ProcessedPosition[]}>({});
 
   useEffect(() => {
-    if (!portfolioData || !optionsInfo) return;
+    if (!portfolioData?.[Ticker.UnderlyingAsset.BTC] || !optionsInfo) return;
     
     const processedPositions = transformAndSortPositionData(
       Ticker.UnderlyingAsset.BTC, 
