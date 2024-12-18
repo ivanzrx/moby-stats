@@ -107,7 +107,7 @@ const PositionsTable = ({ positions }: { positions: {[key: string]: ProcessedPos
                 
                 return [
                   // 만기일 구분 행
-                  <tr key={expiry} className="bg-base-200">
+                  <tr key={expiry} className="bg-base-300 font-semibold">
                     <td className="font-bold">{formattedDate}</td>
                     <td></td>
                     <td></td>
@@ -121,7 +121,7 @@ const PositionsTable = ({ positions }: { positions: {[key: string]: ProcessedPos
                   </tr>,
                   // 개별 포지션 행들
                   ...positionsList.map((position, index) => (
-                    <tr key={`${expiry}-${index}`}>
+                    <tr key={`${expiry}-${index}`} className="opacity-70">
                       <td>{position.mainOptionName}</td>
                       <td>{position.pairedOptionStrikePrice || ''}</td>
                       <td className={position.isBuy ? "text-success" : "text-error"}>

@@ -49,7 +49,7 @@ const ValueRow = ({ label, value, isSubItem = false }: { label: string, value: n
 );
 
 const OLPValueCard = ({ assets, positionValue }: { assets: Assets, positionValue: number }) => {
-  const olpDv = assets.depositedUsd - assets.availableUsd;  // OLPDV
+  const olpDv = assets.depositedUsd;  // OLPDV
   const olpPv = positionValue;  // OLPPV
   const totalValue = olpDv + olpPv;
 
